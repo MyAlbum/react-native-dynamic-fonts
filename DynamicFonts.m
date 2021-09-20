@@ -16,9 +16,14 @@ RCT_EXPORT_MODULE();
 
 - (void) loadFontWithData:(CGDataProviderRef) fontDataProvider callback:(RCTResponseSenderBlock)callback
 {
+  if ( fontDataProvider == nil ) {
+    callback(@"fontDataProvider is nil");
+    return;
+  }
+  
   CGFontRef newFont = CGFontCreateWithDataProvider(fontDataProvider);
   NSString *newFontName = (__bridge NSString *)CGFontCopyPostScriptName(newFont);
-
+  
   UIFont* font = [UIFont fontWithName:newFontName size:16];
   if (font != nil) {
     CGDataProviderRelease(fontDataProvider);
@@ -115,6 +120,11 @@ RCT_EXPORT_METHOD(loadFontFromFile:(NSDictionary *)options callback:(RCTResponse
   if ([type isEqual:[NSNull null]]) type = @"ttf";
     
   CGDataProviderRef fontDataProvider = CGDataProviderCreateWithFilename(filePath.fileSystemRepresentation);
+  if ( fontDataProvider == nil ) {
+    callback(@[@"CGDataProviderCreateWithFilename failed, can't open file at filePath"]);
+    return;
+  }
+  
   [self loadFontWithData:fontDataProvider callback:callback];
 }
 
